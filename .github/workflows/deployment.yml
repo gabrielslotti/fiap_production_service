@@ -70,7 +70,7 @@ jobs:
 
     - name: Build and Push Docker image
       run: |
-        IMAGE_URI="docker.io/${{ secrets.DOCKER_USERNAME }}/food-orders-service:latest"
+        IMAGE_URI="docker.io/${{ secrets.DOCKER_USERNAME }}/food-production-service:latest"
         echo "Logging in to Docker Hub"
         echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
         docker build -t "$IMAGE_URI" .
@@ -79,10 +79,10 @@ jobs:
     - name: Deploy to Cloud Run
       run: |
         gcloud run deploy food-production-service  \
-          --image "docker.io/${{ secrets.DOCKER_USERNAME }}/food-orders-service:latest" \
+          --image "docker.io/${{ secrets.DOCKER_USERNAME }}/food-production-service:latest" \
           --platform managed \
           --region ${{ secrets.GCP_LOCATION }} \
-          --port 8001 \
+          --port 8002 \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 1 \
