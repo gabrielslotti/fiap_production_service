@@ -82,7 +82,7 @@ jobs:
           --image "docker.io/${{ secrets.DOCKER_USERNAME }}/food-production-service:latest" \
           --platform managed \
           --region ${{ secrets.GCP_LOCATION }} \
-          --port 8002 \
+          --port 8000 \
           --memory 512Mi \
           --cpu 1 \
           --max-instances 1 \
