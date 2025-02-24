@@ -37,7 +37,7 @@ class PikaAsyncClient():
 
     async def process_incoming_message(self, message):
         """Processing incoming message from RabbitMQ"""
-        message.ack()
+        await message.ack()
         body = message.body
         logger.debug('Received message')
         if body:

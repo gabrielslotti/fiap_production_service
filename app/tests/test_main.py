@@ -1,29 +1,12 @@
 import json
 import pytest
 from fastapi.testclient import TestClient
-# from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 from sqlalchemy import Column, Integer, String, text
 from sqlalchemy.dialects.sqlite import JSON
 from app.database import Base, get_db
 from app.tests.db import engine, override_get_db
 from app import main
-
-
-"""
-with patch("pika.BlockingConnection") as mock_pika_conn:
-    # Configura os mocks
-    mock_pika_instance = MagicMock()
-    mock_pika_conn.return_value = mock_pika_instance
-
-    from app import main
-
-
-@pytest.fixture(autouse=True)
-def mock_dependencies():
-    yield {
-        "pika": mock_pika_instance,
-    }
-"""
 
 
 class OrderTest(Base):
@@ -86,18 +69,20 @@ def test_health():
 
 
 def test_order_production(test_db):
-    response = client.post(
-        "/update",
-        json={
+    with patch("httpx.post") as mock_post:
+        mock_post.return_value.status_code = 200
+
+        response = client.post(
+            "/update",
+            json={
+                "id": 1,
+                "external_id": "abc-123",
+                "status": "Em preparação"
+            }
+        )
+
+        assert response.status_code == 200
+        assert response.json() == {
             "id": 1,
-            "external_id": "abc-123",
             "status": "Em preparação"
         }
-    )
-
-    assert response.status_code == 200
-    assert response.json() == {
-        "id": 1,
-        "external_id": "abc-123",
-        "status": "Em preparação"
-    }

@@ -9,7 +9,11 @@ def receive_order(order_message: dict):
 
     :param order_message: Order received as a message from rmq.
     """
-    order_raw = OrderReceived(**order_message).model_dump()
+    order_raw = OrderReceived(
+        external_id=order_message["external_id"],
+        status=order_message["status"],
+        items=order_message["items"]
+    ).model_dump()
 
     db_session = next(database.get_db())
 
