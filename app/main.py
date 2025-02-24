@@ -1,5 +1,6 @@
 import asyncio
 
+from aiormq.exceptions import AMQPConnectionError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
@@ -45,9 +46,12 @@ logger.add("log_api.log", rotation="10 MB")  # Automatically rotate log file
 
 @app.on_event('startup')
 async def startup():
-    loop = asyncio.get_running_loop()
-    task = loop.create_task(app.pika_client.consume(loop))
-    await task
+    try:
+        loop = asyncio.get_running_loop()
+        task = loop.create_task(app.pika_client.consume(loop))
+        await task
+    except AMQPConnectionError as exc:
+        logger.warning(f"Error on RabbitMQ: {str(exc)}")
 
 
 @app.exception_handler(SQLAlchemyError)
