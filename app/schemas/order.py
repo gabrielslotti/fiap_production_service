@@ -22,5 +22,4 @@ class OrderReceivedResponse(OrderReceived):
 
 class OrderStatusUpdate(BaseModel):
     id: int
-    external_id: str
     status: OrderStatusEnum

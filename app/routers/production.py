@@ -1,10 +1,22 @@
 from fastapi import APIRouter, HTTPException, Depends, status
 from sqlalchemy.orm import Session
+from functools import lru_cache
+import httpx
 
 from app.models.order import Order as OrderModel
 from app.schemas.order import OrderStatusUpdate
-from .. import database
+from .. import database, config
 
+
+@lru_cache()
+def get_settings():
+    """
+    Config settings function.
+    """
+    return config.Settings()
+
+
+conf_settings = get_settings()
 
 router = APIRouter()
 
@@ -36,8 +48,22 @@ def update_order(
     db_session.commit()
     db_session.refresh(db_order)
 
+    # Callback Orders Service to create the order
+    req = httpx.post(
+        f"{conf_settings.order_service_url}/order/update",
+        json={
+            "external_id": db_order.external_id,
+            "status": db_order.status
+        }
+    )
+
+    if req.status_code != 200:
+        raise HTTPException(
+            status_code=400,
+            detail="Error calling back order service"
+        )
+
     return OrderStatusUpdate(
         id=db_order.id,
-        external_id=db_order.external_id,
         status=db_order.status
     )
