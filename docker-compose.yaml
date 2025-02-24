@@ -43,7 +43,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASS: postgres
-      DB_BASE: food
+      DB_BASE: food_production
       RABBIT_HOST: rabbitmq
       RABBIT_PORT: 5672
       RABBIT_USER: admin
